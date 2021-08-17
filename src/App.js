@@ -1,25 +1,34 @@
-import React from 'react';
-import Header from './Components/Layout/Header'
-import Meals from './Components/Meals/Meals'
-import Cart from './Components/Cart/Cart'
-import CartProvider from './store/CartProvider'
-import {useState} from 'react'
+import React, { useContext } from "react";
+
+import Meals from "./Components/Meals/Meals";
+
+import UserAuth from "./Pages/userAuth";
+
+import Layout from "./Components/Layout/Layout";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+import cartContext from "./store/cart-context";
+
+import "./app.css";
 
 function App() {
-  const[cartOpen,setCartOpen]=useState(false )
-  const OpenCartHandler=()=>{
-    setCartOpen(true)
-  }
+  const ctx = useContext(cartContext);
+  console.log(ctx);
 
-  const CloseCartHandler=()=>{
-    setCartOpen(false)
-  }
-
-  const cart = cartOpen?<Cart close={CloseCartHandler}/>:null
-  return (<CartProvider>
-    {cart}
-  <Header open={OpenCartHandler}/><main><Meals/></main></CartProvider>
-   
+  return (
+    <BrowserRouter>
+      <Layout>
+        <Switch>
+          <Route path="/" exact>
+            <UserAuth />
+          </Route>
+          {ctx.user && (
+            <Route path="/order">
+              <Meals />
+            </Route>
+          )}
+        </Switch>
+      </Layout>
+    </BrowserRouter>
   );
 }
 

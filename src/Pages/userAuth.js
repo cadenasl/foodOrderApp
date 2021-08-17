@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import classes from "./userAuth.module.css";
 import { validEmail, validPassword } from "../Regex/regex";
+import cartContext from "../store/cart-context";
+import { useHistory } from "react-router-dom";
 
 const UserAuth = () => {
   const [name, setName] = useState("");
@@ -13,7 +15,12 @@ const UserAuth = () => {
   const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
   const [passwordIsTouched, setPasswordIsTouched] = useState(false);
   const [signIn, setSignIn] = useState(true);
+  const [signInError, setSignInError] = useState();
+  const [signUpError, setSignUpError] = useState();
 
+  const Auth = useContext(cartContext);
+  console.log(Auth.user);
+  let history = useHistory();
   const SignInOrSignUpHandler = () => {
     setSignIn(!signIn);
   };
@@ -57,13 +64,28 @@ const UserAuth = () => {
   const passwordIsTouchedHandler = () => {
     setPasswordIsTouched(true);
   };
+
   console.log(validEmail);
-  const onSubmitHandler = (event) => {
+  const onSubmitHandler = async (event) => {
     event.preventDefault();
 
-    console.log(email);
+    if (signIn) {
+      try {
+        Auth.SignIn(email, password);
+        history.push("/order");
+      } catch {
+        setSignInError("failed to log in");
+      }
+    } else {
+      try {
+        Auth.signUp(email, password, name);
 
-    console.log(password);
+        history.push("/order");
+      } catch (err) {
+        console.log(err);
+        setSignUpError("failed to create account");
+      }
+    }
   };
   let formIsValid = false;
   if (!signIn) {
@@ -80,6 +102,8 @@ const UserAuth = () => {
     <div className={classes.formDiv}>
       <h1>Welcome to React Meals</h1>
       <h2>Please {signIn ? "Sign In" : "Sign Up"} To Order</h2>
+      {signUpError && signUpError}
+      {signInError && signInError}
       <form className={classes.form} onSubmit={onSubmitHandler} noValidate>
         {signIn ? null : (
           <React.Fragment>
