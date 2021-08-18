@@ -4,6 +4,7 @@ import HeaderCartButton from "../Layout/HeaderCartButton";
 import classes from "./Header.module.css";
 import cartContext from "../../store/cart-context";
 import { useHistory } from "react-router";
+import Button from "react-bootstrap/Button";
 
 function Header(props) {
   const Ctx = useContext(cartContext);
@@ -23,12 +24,18 @@ function Header(props) {
     <Fragment>
       <header className={classes.header}>
         <h1>ReactMeals</h1>
-        {Ctx.user && (
-          <button type="submit" onClick={signOutHandler}>
-            sign out
-          </button>
-        )}
-        {Ctx.user != null && <HeaderCartButton onClick={props.open} />}
+        <div className={classes.headerIcons}>
+          {Ctx.user != null && <HeaderCartButton onClick={props.open} />}
+          {Ctx.user && (
+            <Button
+              type="submit"
+              onClick={signOutHandler}
+              variant="outline-danger"
+            >
+              Sign out
+            </Button>
+          )}
+        </div>
       </header>
       <div className={classes["main-image"]}>
         <img src={mealPicture} alt="a table of delicious food!" />

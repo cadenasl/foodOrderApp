@@ -25,7 +25,7 @@ function HeaderCartButton(props) {
     };
   }, [items]);
   return (
-    <button onClick={props.onClick} className={buttonClasses}>
+    <button onClick={props.onClick} className={classes.button}>
       <span className={classes.icon}>
         <CartIcon />
       </span>

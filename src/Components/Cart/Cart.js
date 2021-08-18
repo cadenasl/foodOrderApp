@@ -5,6 +5,7 @@ import cartContext from "../../store/cart-context";
 import CartItem from "./cartItem";
 import Checkout from "./Checkout";
 import React from "react";
+import { db } from "../../firebase";
 
 function Cart(props) {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,6 +14,7 @@ function Cart(props) {
   const [openCheckOut, setOpenCheckOut] = useState(false);
   const cartCtx = useContext(cartContext);
   const totalAmount = `${cartCtx.totalAmount.toFixed(2)}`;
+  console.log(cartCtx.user.uid);
   const cartItemAddHandler = (item) => {
     cartCtx.addItem({ ...item, amount: 1 });
   };
@@ -32,18 +34,22 @@ function Cart(props) {
   const submitHandler = (userData) => {
     setDidSubmit(true);
     setIsLoading(true);
-    fetch("https://food-app-c6810-default-rtdb.firebaseio.com/orders.json", {
-      method: "POST",
-      body: JSON.stringify({ user: userData, userItem: cartCtx.items }),
-    })
-      .then((response) => response.json())
+    const orderRef = db
+      .collection("users")
+      .doc(cartCtx.user.uid)
+      .collection("orders");
+    orderRef
+      .add({ order: cartCtx.items, address: userData })
+      .then((docRef) => {
+        console.log("Document is updated", docRef.id);
+      })
       .catch((error) => {
-        console.log(error.message);
+        console.log("Error adding document", error);
       });
+
     setIsLoading(false);
     cartCtx.clearItems();
   };
-
   const cartItems = (
     <ul className={classes["cart-items"]}>
       {cartCtx.items.map((item) => {
@@ -99,5 +105,4 @@ function Cart(props) {
     </Modal>
   );
 }
-
 export default Cart;

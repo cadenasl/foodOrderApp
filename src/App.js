@@ -21,6 +21,7 @@ function App() {
           <Route path="/" exact>
             <UserAuth />
           </Route>
+
           {ctx.user && (
             <Route path="/order">
               <Meals />
